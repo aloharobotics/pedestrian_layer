@@ -6,6 +6,7 @@
 #include <costmap_2d/layered_costmap.h>
 #include <costmap_2d/GenericPluginConfig.h>
 #include <dynamic_reconfigure/server.h>
+#include <std_msgs/String.h>
 
 namespace pedestrian_layer {
 

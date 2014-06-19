@@ -1,5 +1,6 @@
 #include "pedestrian_layer/PedestrianLayer.hpp"
 #include <pluginlib/class_list_macros.h>
+#include <iostream>
 
 PLUGINLIB_EXPORT_CLASS(pedestrian_layer::PedestrianLayer, costmap_2d::Layer)
 
@@ -15,13 +16,11 @@ void PedestrianLayer::onInitialize()
 {
   ros::NodeHandle nh("~/" + name_);
   current_ = true;
-
   dsrv_ = new dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig>(nh);
   dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig>::CallbackType cb = boost::bind(
       &PedestrianLayer::reconfigureCB, this, _1, _2);
   dsrv_->setCallback(cb);
 }
-
 
 void PedestrianLayer::reconfigureCB(costmap_2d::GenericPluginConfig &config, uint32_t level)
 {

@@ -106,6 +106,7 @@ CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o
  /opt/ros/hydro/include/sensor_msgs/PointCloud.h
  /opt/ros/hydro/include/std_msgs/Empty.h
  /opt/ros/hydro/include/std_msgs/Header.h
+ /opt/ros/hydro/include/std_msgs/String.h
  /opt/ros/hydro/include/tf/FrameGraph.h
  /opt/ros/hydro/include/tf/FrameGraphRequest.h
  /opt/ros/hydro/include/tf/FrameGraphResponse.h

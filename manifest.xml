@@ -11,6 +11,8 @@
   <depend package="roscpp"/>
   <depend package="costmap_2d"/>
   <depend package="dynamic_reconfigure"/>
+  <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
   <export>
     <costmap_2d plugin="${prefix}/costmap_plugins.xml" />
   </export>
