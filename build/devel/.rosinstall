@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/federico/Development/Ros/pedestrian_layer/build/devel/setup.sh

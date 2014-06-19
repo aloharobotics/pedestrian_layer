@@ -1,0 +1,20 @@
+<package>
+  <description brief="pedestrian_layer">
+
+     pedestrian_layer
+
+  </description>
+  <author>federico</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/pedestrian_layer</url>
+  <depend package="roscpp"/>
+  <depend package="costmap_2d"/>
+  <depend package="dynamic_reconfigure"/>
+  <export>
+    <costmap_2d plugin="${prefix}/costmap_plugins.xml" />
+  </export>
+
+</package>
+
+
