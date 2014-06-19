@@ -9,6 +9,8 @@ namespace pedestrian_layer {
 
 PedestrianLayer::PedestrianLayer() {}
 
+PedestrianLayer::~PedestrianLayer() {}
+
 void PedestrianLayer::onInitialize()
 {
   ros::NodeHandle nh("~/" + name_);
@@ -26,8 +28,8 @@ void PedestrianLayer::reconfigureCB(costmap_2d::GenericPluginConfig &config, uin
   enabled_ = config.enabled;
 }
 
-void PedestrianLayer::updateBounds(double origin_x, double origin_y, double origin_yaw, double* min_x,
-                                           double* min_y, double* max_x, double* max_y)
+void PedestrianLayer::updateBounds(double origin_x, double origin_y, double origin_yaw, 
+                                   double* min_x, double* min_y, double* max_x, double* max_y)
 {
   if (!enabled_)
     return;
@@ -41,8 +43,8 @@ void PedestrianLayer::updateBounds(double origin_x, double origin_y, double orig
   *max_y = std::max(*max_y, mark_y_);
 }
 
-void PedestrianLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i,
-                                          int max_j)
+void PedestrianLayer::updateCosts(costmap_2d::Costmap2D& master_grid, 
+                                  int min_i, int min_j, int max_i, int max_j)
 {
   if (!enabled_)
     return;

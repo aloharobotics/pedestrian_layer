@@ -11,6 +11,12 @@ SET(CMAKE_FORCE_UNIX_PATHS 1)
 # The C and CXX include file search paths:
 SET(CMAKE_C_INCLUDE_PATH
   "/home/federico/Development/Ros/pedestrian_layer/include"
+  "/opt/ros/hydro/include"
+  "/usr/include/eigen3"
+  "/usr/include/pcl-1.7"
+  "/usr/include/ni"
+  "/usr/include/vtk-5.8"
+  "/usr/include/qhull"
   "/usr/src/gtest/include"
   "/usr/src/gtest"
   )

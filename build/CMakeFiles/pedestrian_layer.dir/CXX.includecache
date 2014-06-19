@@ -7,6 +7,8 @@
 #IncludeRegexTransform: 
 
 ../include/pedestrian_layer/PedestrianLayer.hpp
+ros/ros.h
+-
 costmap_2d/layer.h
 -
 costmap_2d/layered_costmap.h

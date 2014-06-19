@@ -24,7 +24,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #common commands for building c++ executables and libraries
 include_directories(include)
 rosbuild_add_library(pedestrian_layer src/PedestrianLayer.cpp)
-rosbuild_add_library(pedestrian_grid_layer src/PedestrianGridLayer.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)

@@ -231,19 +231,6 @@ doxygen/fast:
 .PHONY : doxygen/fast
 
 #=============================================================================
-# Target rules for targets named pedestrian_grid_layer
-
-# Build rule for target.
-pedestrian_grid_layer: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 pedestrian_grid_layer
-.PHONY : pedestrian_grid_layer
-
-# fast build rule for target.
-pedestrian_grid_layer/fast:
-	$(MAKE) -f CMakeFiles/pedestrian_grid_layer.dir/build.make CMakeFiles/pedestrian_grid_layer.dir/build
-.PHONY : pedestrian_grid_layer/fast
-
-#=============================================================================
 # Target rules for targets named pedestrian_layer
 
 # Build rule for target.
@@ -438,30 +425,6 @@ gtest_main/fast:
 	$(MAKE) -f gtest/CMakeFiles/gtest_main.dir/build.make gtest/CMakeFiles/gtest_main.dir/build
 .PHONY : gtest_main/fast
 
-src/PedestrianGridLayer.o: src/PedestrianGridLayer.cpp.o
-.PHONY : src/PedestrianGridLayer.o
-
-# target to build an object file
-src/PedestrianGridLayer.cpp.o:
-	$(MAKE) -f CMakeFiles/pedestrian_grid_layer.dir/build.make CMakeFiles/pedestrian_grid_layer.dir/src/PedestrianGridLayer.cpp.o
-.PHONY : src/PedestrianGridLayer.cpp.o
-
-src/PedestrianGridLayer.i: src/PedestrianGridLayer.cpp.i
-.PHONY : src/PedestrianGridLayer.i
-
-# target to preprocess a source file
-src/PedestrianGridLayer.cpp.i:
-	$(MAKE) -f CMakeFiles/pedestrian_grid_layer.dir/build.make CMakeFiles/pedestrian_grid_layer.dir/src/PedestrianGridLayer.cpp.i
-.PHONY : src/PedestrianGridLayer.cpp.i
-
-src/PedestrianGridLayer.s: src/PedestrianGridLayer.cpp.s
-.PHONY : src/PedestrianGridLayer.s
-
-# target to generate assembly for a file
-src/PedestrianGridLayer.cpp.s:
-	$(MAKE) -f CMakeFiles/pedestrian_grid_layer.dir/build.make CMakeFiles/pedestrian_grid_layer.dir/src/PedestrianGridLayer.cpp.s
-.PHONY : src/PedestrianGridLayer.cpp.s
-
 src/PedestrianLayer.o: src/PedestrianLayer.cpp.o
 .PHONY : src/PedestrianLayer.o
 
@@ -504,7 +467,6 @@ help:
 	@echo "... install/local"
 	@echo "... install/strip"
 	@echo "... list_install_components"
-	@echo "... pedestrian_grid_layer"
 	@echo "... pedestrian_layer"
 	@echo "... rebuild_cache"
 	@echo "... rosbuild_clean-test-results"
@@ -521,9 +483,6 @@ help:
 	@echo "... tests"
 	@echo "... gtest"
 	@echo "... gtest_main"
-	@echo "... src/PedestrianGridLayer.o"
-	@echo "... src/PedestrianGridLayer.i"
-	@echo "... src/PedestrianGridLayer.s"
 	@echo "... src/PedestrianLayer.o"
 	@echo "... src/PedestrianLayer.i"
 	@echo "... src/PedestrianLayer.s"
