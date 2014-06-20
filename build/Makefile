@@ -462,30 +462,6 @@ src/PedestrianLayer.cpp.s:
 	$(MAKE) -f CMakeFiles/pedestrian_layer.dir/build.make CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.s
 .PHONY : src/PedestrianLayer.cpp.s
 
-src/TargetsCostUpdater.o: src/TargetsCostUpdater.cpp.o
-.PHONY : src/TargetsCostUpdater.o
-
-# target to build an object file
-src/TargetsCostUpdater.cpp.o:
-	$(MAKE) -f CMakeFiles/pedestrian_layer.dir/build.make CMakeFiles/pedestrian_layer.dir/src/TargetsCostUpdater.cpp.o
-.PHONY : src/TargetsCostUpdater.cpp.o
-
-src/TargetsCostUpdater.i: src/TargetsCostUpdater.cpp.i
-.PHONY : src/TargetsCostUpdater.i
-
-# target to preprocess a source file
-src/TargetsCostUpdater.cpp.i:
-	$(MAKE) -f CMakeFiles/pedestrian_layer.dir/build.make CMakeFiles/pedestrian_layer.dir/src/TargetsCostUpdater.cpp.i
-.PHONY : src/TargetsCostUpdater.cpp.i
-
-src/TargetsCostUpdater.s: src/TargetsCostUpdater.cpp.s
-.PHONY : src/TargetsCostUpdater.s
-
-# target to generate assembly for a file
-src/TargetsCostUpdater.cpp.s:
-	$(MAKE) -f CMakeFiles/pedestrian_layer.dir/build.make CMakeFiles/pedestrian_layer.dir/src/TargetsCostUpdater.cpp.s
-.PHONY : src/TargetsCostUpdater.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -524,9 +500,6 @@ help:
 	@echo "... src/PedestrianLayer.o"
 	@echo "... src/PedestrianLayer.i"
 	@echo "... src/PedestrianLayer.s"
-	@echo "... src/TargetsCostUpdater.o"
-	@echo "... src/TargetsCostUpdater.i"
-	@echo "... src/TargetsCostUpdater.s"
 .PHONY : help
 
 

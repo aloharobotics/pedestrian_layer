@@ -60,25 +60,25 @@
 #include <costmap_2d/layered_costmap.h>
 #include <costmap_2d/GenericPluginConfig.h>
 #include <dynamic_reconfigure/server.h>
-#include "PTrackingBridge/TargetEstimations.h"
-#include "pedestrian_layer/TargetsCostUpdater.hpp"
 
 namespace pedestrian_layer {
 
-class PedestrianLayer : public costmap_2d::Layer
+class PedestrianLayer : 
+      public costmap_2d::Layer, 
+      public costmap_2d::Costmap2D
 {
  public:
   PedestrianLayer();
   virtual void onInitialize();
+  virtual void matchSize();
   virtual void updateBounds(double, double, double, double*, double*, double*, double*);
   virtual void updateCosts(costmap_2d::Costmap2D&, int, int, int, int);
+  bool isDiscretized();
  private:
   void reconfigureCB(costmap_2d::GenericPluginConfig&, uint32_t);
-  void getTargetEstimations(const PTrackingBridge::TargetEstimations::ConstPtr&);
   double mark_x_, mark_y_;
   dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig> *dsrv_;  
   ros::Subscriber sub_;
-  TargetsCostUpdater tcu;
 };
 
 }
