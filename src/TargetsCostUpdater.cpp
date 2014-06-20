@@ -1,10 +1,10 @@
-// PedestrianLayer.hpp --- 
+// TargetsCostUpdater.cpp --- 
 // 
-// Filename: PedestrianLayer.hpp
+// Filename: TargetsCostsUpdater.cpp
 // Description: 
 // Author: Federico Boniardi
 // Maintainer: 
-// Created: Fri Jun 20 15:33:40 2014 (+0100)
+// Created: Fri Jun 20 19:54:47 2014 (+0100)
 // Version: 
 // Last-Updated: 
 //           By: 
@@ -52,38 +52,31 @@
 
 // Code:
 
-#ifndef PEDESTRIANLAYER_H
-#define PEDESTRIANLAYER_H
-
-#include <ros/ros.h>
-#include <costmap_2d/layer.h>
-#include <costmap_2d/layered_costmap.h>
-#include <costmap_2d/GenericPluginConfig.h>
-#include <dynamic_reconfigure/server.h>
-#include "PTrackingBridge/TargetEstimations.h"
 #include "pedestrian_layer/TargetsCostUpdater.hpp"
+
+using geometry_msgs::Point32;
 
 namespace pedestrian_layer {
 
-class PedestrianLayer : public costmap_2d::Layer
+TargetsCostUpdater::TargetsCostUpdater() {}
+
+TargetsCostUpdater::~TargetsCostUpdater() {}
+
+void TargetsCostUpdater::init(ros::NodeHandle& nh)
 {
- public:
-  PedestrianLayer();
-  virtual void onInitialize();
-  virtual void updateBounds(double, double, double, double*, double*, double*, double*);
-  virtual void updateCosts(costmap_2d::Costmap2D&, int, int, int, int);
- private:
-  void reconfigureCB(costmap_2d::GenericPluginConfig&, uint32_t);
-  void getTargetEstimations(const PTrackingBridge::TargetEstimations::ConstPtr&);
-  double mark_x_, mark_y_;
-  dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig> *dsrv_;  
-  ros::Subscriber sub_;
-  TargetsCostUpdater tcu;
-};
+  nh.param("update_freq", update_freq, 10.0);
+  nh.param("time_steps", time_steps, 1);
+  counter = 0;
+}
+
+void TargetsCostUpdater::drawPedestrians(Point32 positions[], Point32 velocities[],
+                                         Point32 eig_val_1[], Point32 eig_val_2[])
+{
+
 
 }
 
-#endif /* PEDESTRIANLAYER_H */
+}
 
 // 
-// PedestrianLayer.hpp ends here
+// TargetsCostsUpdater.cpp ends here

@@ -1,7 +1,4 @@
 FILE(REMOVE_RECURSE
-  "../msg_gen"
-  "../msg_gen"
-  "../src/pedestrian_layer/msg"
   "CMakeFiles/rospack_genmsg_all"
 )
 

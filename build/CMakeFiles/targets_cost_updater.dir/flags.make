@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_FLAGS = -O2 -g -fPIC -I/home/federico/Development/Ros/pedestrian_layer/include -I/home/federico/Development/Ros/Youbot-RVO/nodes/PTrackingBridge/msg_gen/cpp/include -I/opt/ros/hydro/include -I/usr/include/eigen3 -I/usr/include/pcl-1.7 -I/usr/include/ni -I/usr/include/vtk-5.8 -I/usr/include/qhull -I/home/federico/Development/Ros/pedestrian_layer/msg_gen/cpp/include    -DROS_PACKAGE_NAME='"pedestrian_layer"'
 
-CXX_DEFINES = -Dpedestrian_layer_EXPORTS
+CXX_DEFINES = -Dtargets_cost_updater_EXPORTS
 
 # TARGET_FLAGS = -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread
 

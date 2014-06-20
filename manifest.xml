@@ -6,13 +6,14 @@
   </description>
   <author>federico</author>
   <license>BSD</license>
-  <review status="unreviewed" notes=""/>
+  <review status="unreviewed" notes="" />
   <url>http://ros.org/wiki/pedestrian_layer</url>
   <depend package="roscpp"/>
   <depend package="costmap_2d"/>
   <depend package="dynamic_reconfigure"/>
   <depend package="geometry_msgs"/>
   <depend package="std_msgs"/>
+  <depend package="PTrackingBridge"/>
   <export>
     <costmap_2d plugin="${prefix}/costmap_plugins.xml" />
   </export>
