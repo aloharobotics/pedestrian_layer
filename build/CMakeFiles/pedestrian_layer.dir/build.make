@@ -117,6 +117,11 @@ CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/visualization_msgs/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/voxel_grid/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/costmap_2d/package.xml
+CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /home/federico/Development/Ros/Youbot-RVO/nodes/PTrackingBridge/manifest.xml
+CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /home/federico/Development/Ros/catkin_workspace/src/youbot_navigation_remote/target_to_pedestrian/manifest.xml
+CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /home/federico/Development/Ros/Youbot-RVO/nodes/PTrackingBridge/msg_gen/generated
+CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /home/federico/Development/Ros/catkin_workspace/src/youbot_navigation_remote/target_to_pedestrian/msg_gen/generated
+CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /home/federico/Development/Ros/catkin_workspace/src/youbot_navigation_remote/target_to_pedestrian/srv_gen/generated
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/federico/Development/Ros/pedestrian_layer/build/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -o CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o -c /home/federico/Development/Ros/pedestrian_layer/src/PedestrianLayer.cpp

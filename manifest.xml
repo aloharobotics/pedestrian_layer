@@ -13,6 +13,8 @@
   <depend package="dynamic_reconfigure"/>
   <depend package="geometry_msgs"/>
   <depend package="std_msgs"/>
+  <depend package="PTrackingBridge"/>
+  <depend package="target_to_pedestrian"/>
   <export>
     <costmap_2d plugin="${prefix}/costmap_plugins.xml" />
   </export>

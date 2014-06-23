@@ -54,11 +54,14 @@
 
 
 #include "pedestrian_layer/PedestrianLayer.hpp"
+#include "target_to_pedestrian/TargetToPedestrian.h"
+#include <cmath>
 #include <pluginlib/class_list_macros.h>
 
 PLUGINLIB_EXPORT_CLASS(pedestrian_layer::PedestrianLayer, costmap_2d::Layer)
 
 using costmap_2d::LETHAL_OBSTACLE;
+using costmap_2d::FREE_SPACE;
 
 namespace pedestrian_layer {
 
@@ -70,11 +73,15 @@ void PedestrianLayer::onInitialize()
   current_ = true;
   default_value_ = costmap_2d::NO_INFORMATION;
   matchSize();
-
+  sub_ = nh.subscribe("ptracking_bridge", 1000, &PedestrianLayer::getTargets, this);
   dsrv_ = new dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig>(nh);
   dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig>::CallbackType cb = boost::bind(
       &PedestrianLayer::reconfigureCB, this, _1, _2);
   dsrv_->setCallback(cb);
+  // FIX THESE LINES (add parameters)
+  count = -1;
+  time_steps = 1;
+  update_freq = 10.0;
 }
 
 void PedestrianLayer::matchSize()
@@ -89,23 +96,36 @@ void PedestrianLayer::reconfigureCB(costmap_2d::GenericPluginConfig &config, uin
   enabled_ = config.enabled;
 }
 
-void PedestrianLayer::updateBounds(double origin_x, double origin_y, double origin_yaw, 
-                                       double* min_x, double* min_y, double* max_x, double* max_y)
+void PedestrianLayer::updateBounds(double robot_x, double robot_y, double robot_yaw, 
+                                   double* min_x, double* min_y, double* max_x, double* max_y)
 {
   if ( !enabled_ )
     return;
 
-  double mark_x = origin_x + cos(origin_yaw), mark_y = origin_y + sin(origin_yaw);
-  unsigned int mx;
-  unsigned int my;
-  if( worldToMap(mark_x, mark_y, mx, my) ) {
-    setCost(mx, my, costmap_2d::LETHAL_OBSTACLE);
+  for(unsigned int i=0; i<clearing.size(); i++) {
+    setCost(clearing[i].first, clearing[i].second, FREE_SPACE);
   }
-  
-  *min_x = std::min(*min_x, mark_x);
-  *min_y = std::min(*min_y, mark_y);
-  *max_x = std::max(*max_x, mark_x);
-  *max_y = std::max(*max_y, mark_y);
+
+  for (unsigned int i=0; i<pedestrian.size(); ++i) {    
+    if( ++count % time_steps == 0 ) {
+      // Drawing the pedestrians
+      clearing.clear();
+      double mark_x = pedestrian[i].pose.x + time_steps*pedestrian[i].velocity * std::cos(pedestrian[i].pose.theta) / update_freq;
+      double mark_y = pedestrian[i].pose.y + time_steps*pedestrian[i].velocity * std::sin(pedestrian[i].pose.theta) / update_freq;
+      unsigned int mx;
+      unsigned int my;
+      if( worldToMap(mark_x, mark_y, mx, my) ) {
+        setCost(mx, my, costmap_2d::LETHAL_OBSTACLE);
+        clearing.push_back(std::pair<unsigned int, unsigned int>(mx, my));
+      } else {
+        ROS_WARN("failed to update the map");
+      }  
+      *min_x = std::min(*min_x, mark_x);
+      *min_y = std::min(*min_y, mark_y);
+      *max_x = std::max(*max_x, mark_x);
+      *max_y = std::max(*max_y, mark_y);
+    } 
+  }
 }
 
 void PedestrianLayer::updateCosts(costmap_2d::Costmap2D& master_grid, 
@@ -113,7 +133,7 @@ void PedestrianLayer::updateCosts(costmap_2d::Costmap2D& master_grid,
 {
   if ( !enabled_ )
     return;
-
+  
   for (int j = min_j; j < max_j; j++) {
     for (int i = min_i; i < max_i; i++) {
       int index = getIndex(i, j);
@@ -124,12 +144,29 @@ void PedestrianLayer::updateCosts(costmap_2d::Costmap2D& master_grid,
   }
 }
 
-bool isDiscretized() 
+bool PedestrianLayer::isDiscretized() 
 {
   return true;
 }
 
-} 
+void PedestrianLayer::getTargets(const PTrackingBridge::TargetEstimations::ConstPtr& tgts_msg)
+{
+  // Target estimations are already in map frame
+  pedestrian.clear();
+  for(unsigned int i=0; i<tgts_msg->identities.size(); ++i) {
+    target_to_pedestrian::PedestrianEstimation ped;
+    ped.id = tgts_msg->identities.at(i);
+    ped.pose.x = tgts_msg->positions.at(i).x;
+    ped.pose.y = tgts_msg->positions.at(i).y;
+    ped.velocity = std::sqrt(std::pow(tgts_msg->velocities.at(i).x, 2) +
+                             std::pow(tgts_msg->velocities.at(i).y, 2));
+    ped.pose.theta = std::asin(tgts_msg->velocities.at(i).y/ped.velocity);
+    ped.cov_position.data[0] = std::pow(tgts_msg->standardDeviations.at(i).x, 2);
+    ped.cov_position.data[1] = std::pow(tgts_msg->standardDeviations.at(i).y, 2);
+    pedestrian.push_back(ped);
+  }
+}
 
+}
 // 
 // PedestrianLayer.cpp ends here
