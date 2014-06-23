@@ -1,0 +1,7 @@
+Per ricompilare DistributedTracker:
+    $ cd ~/Development/Projects/DistributedTracker/build
+    $ make
+
+Per lanciare il tracker
+    $ cd ~/Development/Projects/DistributedTracker/scripts
+    $ ./run.sh 1
