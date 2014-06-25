@@ -107,32 +107,44 @@ void PedestrianLayer::updateBounds(double robot_x, double robot_y, double robot_
   if ( !enabled_ )
     return;
 
-  for(unsigned int i=0; i<clearing.size(); i++) {
-    setCost(clearing[i].first, clearing[i].second, FREE_SPACE);
+  double mark_x = robot_x + cos(robot_yaw), mark_y = robot_y + sin(robot_yaw);
+  unsigned int mx;
+  unsigned int my;
+  if(worldToMap(mark_x, mark_y, mx, my)){
+    setCost(mx, my, LETHAL_OBSTACLE);
   }
+  
+  *min_x = std::min(*min_x, mark_x);
+  *min_y = std::min(*min_y, mark_y);
+  *max_x = std::max(*max_x, mark_x);
+  *max_y = std::max(*max_y, mark_y);
+  
+  // for(unsigned int i=0; i<clearing.size(); i++) {
+  //   setCost(clearing[i].first, clearing[i].second, FREE_SPACE);
+  // }
 
-  for (unsigned int i=0; i<pedestrian.size(); ++i) {    
-    if( ++count % update_steps == 0 ) {
-      // Drawing the pedestrians
-      clearing.clear();
-      double mark_x = pedestrian[i].pose.x + update_steps*pedestrian[i].velocity * std::cos(pedestrian[i].pose.theta) / update_freq;
-      double mark_y = pedestrian[i].pose.y + update_steps*pedestrian[i].velocity * std::sin(pedestrian[i].pose.theta) / update_freq;
-      unsigned int mx;
-      unsigned int my;
-      if( worldToMap(mark_x, mark_y, mx, my) ) {
-        if( l2distance(std::pair<double,double>(mark_x, mark_y), std::pair<double,double>(robot_x, robot_y)) > 0.4 ) { // The robot itself is tracked by the kinect too
-          setCost(mx, my, costmap_2d::LETHAL_OBSTACLE);
-          clearing.push_back(std::pair<unsigned int, unsigned int>(mx, my));
-        }
-      } else {
-        ROS_WARN("failed to update the map");
-      }  
-      *min_x = std::min(*min_x, mark_x);
-      *min_y = std::min(*min_y, mark_y);
-      *max_x = std::max(*max_x, mark_x);
-      *max_y = std::max(*max_y, mark_y);
-    } 
-  }
+  // for (unsigned int i=0; i<pedestrian.size(); ++i) {    
+  //   if( ++count % update_steps == 0 ) {
+  //     // Drawing the pedestrians
+  //     clearing.clear();
+  //     double mark_x = pedestrian[i].pose.x + update_steps*pedestrian[i].velocity * std::cos(pedestrian[i].pose.theta) / update_freq;
+  //     double mark_y = pedestrian[i].pose.y + update_steps*pedestrian[i].velocity * std::sin(pedestrian[i].pose.theta) / update_freq;
+  //     unsigned int mx;
+  //     unsigned int my;
+  //     if( worldToMap(mark_x, mark_y, mx, my) ) {
+  //       if( l2distance(std::pair<double,double>(mark_x, mark_y), std::pair<double,double>(robot_x, robot_y)) > 0.4 ) { // The robot itself is tracked by the kinect too
+  //         setCost(mx, my, costmap_2d::LETHAL_OBSTACLE);
+  //         clearing.push_back(std::pair<unsigned int, unsigned int>(mx, my));
+  //       }
+  //     } else {
+  //       ROS_WARN("failed to update the map");
+  //     }  
+  //     *min_x = std::min(*min_x, mark_x);
+  //     *min_y = std::min(*min_y, mark_y);
+  //     *max_x = std::max(*max_x, mark_x);
+  //     *max_y = std::max(*max_y, mark_y);
+  //   } 
+  // }
 }
 
 void PedestrianLayer::updateCosts(costmap_2d::Costmap2D& master_grid, 
