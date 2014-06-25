@@ -85,9 +85,9 @@ class PedestrianLayer :
   // PTrackingBridge::TargetEstimations tgts_;
   std::vector<target_to_pedestrian::PedestrianEstimation> pedestrian;
   std::vector< std::pair<unsigned int, unsigned int> > clearing;
-  // FIX THESE
   int count;
-  int time_steps;
+  // FIX THESE
+  int update_steps;
   double update_freq;
 };
 

@@ -81,6 +81,7 @@ CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/rosservice/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/dynamic_reconfigure/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/geometry_msgs/package.xml
+CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/angles/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/sensor_msgs/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/message_filters/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/rosclean/package.xml
@@ -100,7 +101,6 @@ CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/tf2_py/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/tf2_ros/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/tf/package.xml
-CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/angles/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/laser_geometry/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/nav_msgs/package.xml
 CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o: /opt/ros/hydro/share/map_msgs/package.xml

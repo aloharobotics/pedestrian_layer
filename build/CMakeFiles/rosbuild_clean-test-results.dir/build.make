@@ -46,7 +46,7 @@ CMAKE_BINARY_DIR = /home/federico/Development/Ros/pedestrian_layer/build
 include CMakeFiles/rosbuild_clean-test-results.dir/progress.make
 
 CMakeFiles/rosbuild_clean-test-results:
-	if ! rm -rf /home/federico/Development/Ros/catkin_workspace/build/test_results/pedestrian_layer; then echo WARNING:\ failed\ to\ remove\ test-results\ directory ; fi
+	if ! rm -rf /home/federico/Development/Ros/catkin_workspace/build/test_results/pedestrian_layer; then echo "WARNING:\ failed\ to\ remove\ test-results\ directory"\; fi
 
 rosbuild_clean-test-results: CMakeFiles/rosbuild_clean-test-results
 rosbuild_clean-test-results: CMakeFiles/rosbuild_clean-test-results.dir/build.make

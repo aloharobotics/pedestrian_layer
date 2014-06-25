@@ -5,10 +5,10 @@
 // Author: Federico Boniardi
 // Maintainer: 
 // Created: Fri Jun 20 15:32:53 2014 (+0100)
-// Version: 
+// Version: Wed Jun 25 13:45:52 2014 (+0100)
 // Last-Updated: 
 //           By: 
-//     Update #: 0
+//     Update #: 4
 // URL: 
 // Keywords: 
 // Compatibility: 
@@ -65,6 +65,11 @@ using costmap_2d::FREE_SPACE;
 
 namespace pedestrian_layer {
 
+double l2distance(std::pair<double,double> x1, std::pair<double,double> x2)
+{
+  return std::sqrt(x1.first * x1.first + x2.second * x2.second);
+}
+
 PedestrianLayer::PedestrianLayer() {}
 
 void PedestrianLayer::onInitialize()
@@ -73,6 +78,8 @@ void PedestrianLayer::onInitialize()
   current_ = true;
   default_value_ = costmap_2d::NO_INFORMATION;
   matchSize();
+  nh.param("update_steps", update_steps, 10);
+  nh.param("update_freq", update_freq, 10.0);
   sub_ = nh.subscribe("ptracking_bridge", 1000, &PedestrianLayer::getTargets, this);
   dsrv_ = new dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig>(nh);
   dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig>::CallbackType cb = boost::bind(
@@ -80,8 +87,6 @@ void PedestrianLayer::onInitialize()
   dsrv_->setCallback(cb);
   // FIX THESE LINES (add parameters)
   count = -1;
-  time_steps = 1;
-  update_freq = 10.0;
 }
 
 void PedestrianLayer::matchSize()
@@ -107,16 +112,18 @@ void PedestrianLayer::updateBounds(double robot_x, double robot_y, double robot_
   }
 
   for (unsigned int i=0; i<pedestrian.size(); ++i) {    
-    if( ++count % time_steps == 0 ) {
+    if( ++count % update_steps == 0 ) {
       // Drawing the pedestrians
       clearing.clear();
-      double mark_x = pedestrian[i].pose.x + time_steps*pedestrian[i].velocity * std::cos(pedestrian[i].pose.theta) / update_freq;
-      double mark_y = pedestrian[i].pose.y + time_steps*pedestrian[i].velocity * std::sin(pedestrian[i].pose.theta) / update_freq;
+      double mark_x = pedestrian[i].pose.x + update_steps*pedestrian[i].velocity * std::cos(pedestrian[i].pose.theta) / update_freq;
+      double mark_y = pedestrian[i].pose.y + update_steps*pedestrian[i].velocity * std::sin(pedestrian[i].pose.theta) / update_freq;
       unsigned int mx;
       unsigned int my;
       if( worldToMap(mark_x, mark_y, mx, my) ) {
-        setCost(mx, my, costmap_2d::LETHAL_OBSTACLE);
-        clearing.push_back(std::pair<unsigned int, unsigned int>(mx, my));
+        if( l2distance(std::pair<double,double>(mark_x, mark_y), std::pair<double,double>(robot_x, robot_y)) > 0.4 ) { // The robot itself is tracked by the kinect too
+          setCost(mx, my, costmap_2d::LETHAL_OBSTACLE);
+          clearing.push_back(std::pair<unsigned int, unsigned int>(mx, my));
+        }
       } else {
         ROS_WARN("failed to update the map");
       }  
