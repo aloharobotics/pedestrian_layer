@@ -76,8 +76,6 @@ void PedestrianLayer::onInitialize()
 {
   ros::NodeHandle nh("~/" + name_);
   current_ = true;
-  default_value_ = costmap_2d::NO_INFORMATION;
-  matchSize();
   nh.param("update_steps", update_steps, 10);
   nh.param("update_freq", update_freq, 10.0);
   sub_ = nh.subscribe("ptracking_bridge", 1000, &PedestrianLayer::getTargets, this);
@@ -85,15 +83,7 @@ void PedestrianLayer::onInitialize()
   dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig>::CallbackType cb = boost::bind(
       &PedestrianLayer::reconfigureCB, this, _1, _2);
   dsrv_->setCallback(cb);
-  // FIX THESE LINES (add parameters)
   count = -1;
-}
-
-void PedestrianLayer::matchSize()
-{
-  Costmap2D* master = layered_costmap_->getCostmap();
-  resizeMap(master->getSizeInCellsX(), master->getSizeInCellsY(), master->getResolution(),
-            master->getOriginX(), master->getOriginY());
 }
 
 void PedestrianLayer::reconfigureCB(costmap_2d::GenericPluginConfig &config, uint32_t level)
@@ -107,53 +97,70 @@ void PedestrianLayer::updateBounds(double robot_x, double robot_y, double robot_
   if ( !enabled_ )
     return;
 
-  for(unsigned int i=0; i<clearing.size(); i++) {
-    setCost(clearing[i].first, clearing[i].second, FREE_SPACE);
-  }
+  double mark_x = robot_x + cos(robot_yaw), mark_y = robot_y + sin(robot_yaw);
+  unsigned int mx;
+  unsigned int my;
 
-  for (unsigned int i=0; i<pedestrian.size(); ++i) {    
-    if( ++count % update_steps == 0 ) {
-      // Drawing the pedestrians
-      clearing.clear();
-      double mark_x = pedestrian[i].pose.x + update_steps*pedestrian[i].velocity * std::cos(pedestrian[i].pose.theta) / update_freq;
-      double mark_y = pedestrian[i].pose.y + update_steps*pedestrian[i].velocity * std::sin(pedestrian[i].pose.theta) / update_freq;
-      unsigned int mx;
-      unsigned int my;
-      if( worldToMap(mark_x, mark_y, mx, my) ) {
-        if( l2distance(std::pair<double,double>(mark_x, mark_y), std::pair<double,double>(robot_x, robot_y)) > 0.4 ) { // The robot itself is tracked by the kinect too
-          setCost(mx, my, costmap_2d::LETHAL_OBSTACLE);
-          clearing.push_back(std::pair<unsigned int, unsigned int>(mx, my));
-        }
-      } else {
-        ROS_WARN("failed to update the map");
-      }  
-      *min_x = std::min(*min_x, mark_x);
-      *min_y = std::min(*min_y, mark_y);
-      *max_x = std::max(*max_x, mark_x);
-      *max_y = std::max(*max_y, mark_y);
-    } 
-  }
+  if (!enabled_)
+    return;
+
+  mark_x_ = robot_x + cos(robot_yaw);
+  mark_y_ = robot_y + sin(robot_yaw);
+
+  *min_x = std::min(*min_x, mark_x_);
+  *min_y = std::min(*min_y, mark_y_);
+  *max_x = std::max(*max_x, mark_x_);
+  *max_y = std::max(*max_y, mark_y_);
+  
+  // for(unsigned int i=0; i<clearing.size(); i++) {
+  //   setCost(clearing[i].first, clearing[i].second, FREE_SPACE);
+  // }
+
+  // for (unsigned int i=0; i<pedestrian.size(); ++i) {    
+  //   if( ++count % update_steps == 0 ) {
+  //     // Drawing the pedestrians
+  //     clearing.clear();
+  //     double mark_x = pedestrian[i].pose.x + update_steps*pedestrian[i].velocity * std::cos(pedestrian[i].pose.theta) / update_freq;
+  //     double mark_y = pedestrian[i].pose.y + update_steps*pedestrian[i].velocity * std::sin(pedestrian[i].pose.theta) / update_freq;
+  //     unsigned int mx;
+  //     unsigned int my;
+  //     if( worldToMap(mark_x, mark_y, mx, my) ) {
+  //       if( l2distance(std::pair<double,double>(mark_x, mark_y), std::pair<double,double>(robot_x, robot_y)) > 0.4 ) { // The robot itself is tracked by the kinect too
+  //         setCost(mx, my, costmap_2d::LETHAL_OBSTACLE);
+  //         clearing.push_back(std::pair<unsigned int, unsigned int>(mx, my));
+  //       }
+  //     } else {
+  //       ROS_WARN("failed to update the map");
+  //     }  
+  //     *min_x = std::min(*min_x, mark_x);
+  //     *min_y = std::min(*min_y, mark_y);
+  //     *max_x = std::max(*max_x, mark_x);
+  //     *max_y = std::max(*max_y, mark_y);
+  //   } 
+  // }
 }
 
 void PedestrianLayer::updateCosts(costmap_2d::Costmap2D& master_grid, 
                                       int min_i, int min_j, int max_i, int max_j)
 {
-  if ( !enabled_ )
-    return;
+  if( !enabled_ )
+      return;
   
-  for (int j = min_j; j < max_j; j++) {
-    for (int i = min_i; i < max_i; i++) {
-      int index = getIndex(i, j);
-      if ( costmap_[index] == costmap_2d::NO_INFORMATION )
-        continue;
-      master_grid.setCost(i, j, costmap_[index]); 
-    }
-  }
-}
-
-bool PedestrianLayer::isDiscretized() 
-{
-  return true;
+  unsigned int mx;
+  unsigned int my;
+  if( master_grid.worldToMap(mark_x_, mark_y_, mx, my) )
+    master_grid.setCost(mx, my, LETHAL_OBSTACLE);
+  // if ( !enabled_ )
+  //   return;
+  
+  // for (int j = min_j; j < max_j; j++) {
+  //   for (int i = min_i; i < max_i; i++) {
+  //     int index = getIndex(i, j);
+  //     // if ( costmap_[index] == costmap_2d::NO_INFORMATION )
+  //     //   continue;
+  //     master_grid.setCost(i, j, costmap_[index]); 
+  //   }
+  // }
 }
 
 void PedestrianLayer::getTargets(const PTrackingBridge::TargetEstimations::ConstPtr& tgts_msg)

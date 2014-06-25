@@ -65,17 +65,13 @@
 
 namespace pedestrian_layer {
 
-class PedestrianLayer : 
-      public costmap_2d::Layer, 
-      public costmap_2d::Costmap2D
+class PedestrianLayer : public costmap_2d::Layer
 {
  public:
   PedestrianLayer();
   virtual void onInitialize();
-  virtual void matchSize();
   virtual void updateBounds(double, double, double, double*, double*, double*, double*);
   virtual void updateCosts(costmap_2d::Costmap2D&, int, int, int, int);
-  bool isDiscretized();
  private:
   void reconfigureCB(costmap_2d::GenericPluginConfig&, uint32_t);
   void getTargets(const PTrackingBridge::TargetEstimations::ConstPtr&);
