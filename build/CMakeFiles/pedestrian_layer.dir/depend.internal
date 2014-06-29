@@ -109,10 +109,7 @@ CMakeFiles/pedestrian_layer.dir/src/PedestrianLayer.cpp.o
  /opt/ros/hydro/include/sensor_msgs/ChannelFloat32.h
  /opt/ros/hydro/include/sensor_msgs/PointCloud.h
  /opt/ros/hydro/include/std_msgs/Empty.h
- /opt/ros/hydro/include/std_msgs/Float32MultiArray.h
  /opt/ros/hydro/include/std_msgs/Header.h
- /opt/ros/hydro/include/std_msgs/MultiArrayDimension.h
- /opt/ros/hydro/include/std_msgs/MultiArrayLayout.h
  /opt/ros/hydro/include/tf/FrameGraph.h
  /opt/ros/hydro/include/tf/FrameGraphRequest.h
  /opt/ros/hydro/include/tf/FrameGraphResponse.h

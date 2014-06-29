@@ -62,6 +62,7 @@ PLUGINLIB_EXPORT_CLASS(pedestrian_layer::PedestrianLayer, costmap_2d::Layer)
 
 using costmap_2d::LETHAL_OBSTACLE;
 using costmap_2d::FREE_SPACE;
+using costmap_2d::INSCRIBED_INFLATED_OBSTACLE;
 
 namespace pedestrian_layer {
 
@@ -75,15 +76,40 @@ PedestrianLayer::PedestrianLayer() {}
 void PedestrianLayer::onInitialize()
 {
   ros::NodeHandle nh("~/" + name_);
+  std::string pedestrians_topic;
+  double costmap_update_freq, resolution, inflation_radius;
+    
   current_ = true;
-  nh.param("update_steps", update_steps, 10);
-  nh.param("update_freq", update_freq, 10.0);
-  sub_ = nh.subscribe("ptracking_bridge", 1000, &PedestrianLayer::getTargets, this);
+
+  if( !nh.getParam("pedestrians_topic", pedestrians_topic) )
+    pedestrians_topic = "/agent_1/PTrackingBridge/targetEstimations";
+  nh.param("/move_base/local_costmap/pedestrian_layer/update_steps", update_steps_, 1);
+  nh.param("/move_base/local_costmap/pedestrian_layer/update_freq", update_freq_, 1.0);
+  nh.param("/move_base/local_costmap/pedestrian_layer/decay_constant", decay_constant_, 10.0);
+  nh.param("/move_base/local_costmap/pedestrian_layer/pedestrian_radius", pedestrian_inflation_radius_, 0.5);
+  nh.param("/move_base/local_costmap/resolution", resolution, 0.05);
+  nh.param("/move_base/local_costmap/inflation_radius", inflation_radius, 0.5);
+  nh.param("/move_base/local_costmap/update_frequency", costmap_update_freq, 5.0);
+
+  window_radius_ = int((0.5*inflation_radius+0.5*pedestrian_inflation_radius_)/resolution);
+  
+  update_costs_ = false;
+
+  if( update_freq_ > costmap_update_freq ) {
+    ROS_WARN("update rate of 'pedestrian_layer' is greater than 'update_frequency' of local_costmap. update_freq will be set to %f ", 0.2*costmap_update_freq);
+    update_ratio_ = 5;
+  } else {
+    update_ratio_ = int(costmap_update_freq/update_freq_);
+  }
+
+  count_ = -1;
+  
+  sub_ = nh.subscribe(pedestrians_topic, 1000, &PedestrianLayer::getTargets, this);
+
   dsrv_ = new dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig>(nh);
   dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig>::CallbackType cb = boost::bind(
       &PedestrianLayer::reconfigureCB, this, _1, _2);
   dsrv_->setCallback(cb);
-  count = -1;
 }
 
 void PedestrianLayer::reconfigureCB(costmap_2d::GenericPluginConfig &config, uint32_t level)
@@ -97,47 +123,25 @@ void PedestrianLayer::updateBounds(double robot_x, double robot_y, double robot_
   if ( !enabled_ )
     return;
 
-  double mark_x = robot_x + cos(robot_yaw), mark_y = robot_y + sin(robot_yaw);
-  unsigned int mx;
-  unsigned int my;
+  if( ++count_ % update_ratio_ == 0 ) {
+    count_ %= update_steps_;
+    clearing_ = mark_;
+    mark_.clear();
 
-  if (!enabled_)
-    return;
-
-  mark_x_ = robot_x + cos(robot_yaw);
-  mark_y_ = robot_y + sin(robot_yaw);
-
-  *min_x = std::min(*min_x, mark_x_);
-  *min_y = std::min(*min_y, mark_y_);
-  *max_x = std::max(*max_x, mark_x_);
-  *max_y = std::max(*max_y, mark_y_);
-  
-  // for(unsigned int i=0; i<clearing.size(); i++) {
-  //   setCost(clearing[i].first, clearing[i].second, FREE_SPACE);
-  // }
-
-  // for (unsigned int i=0; i<pedestrian.size(); ++i) {    
-  //   if( ++count % update_steps == 0 ) {
-  //     // Drawing the pedestrians
-  //     clearing.clear();
-  //     double mark_x = pedestrian[i].pose.x + update_steps*pedestrian[i].velocity * std::cos(pedestrian[i].pose.theta) / update_freq;
-  //     double mark_y = pedestrian[i].pose.y + update_steps*pedestrian[i].velocity * std::sin(pedestrian[i].pose.theta) / update_freq;
-  //     unsigned int mx;
-  //     unsigned int my;
-  //     if( worldToMap(mark_x, mark_y, mx, my) ) {
-  //       if( l2distance(std::pair<double,double>(mark_x, mark_y), std::pair<double,double>(robot_x, robot_y)) > 0.4 ) { // The robot itself is tracked by the kinect too
-  //         setCost(mx, my, costmap_2d::LETHAL_OBSTACLE);
-  //         clearing.push_back(std::pair<unsigned int, unsigned int>(mx, my));
-  //       }
-  //     } else {
-  //       ROS_WARN("failed to update the map");
-  //     }  
-  //     *min_x = std::min(*min_x, mark_x);
-  //     *min_y = std::min(*min_y, mark_y);
-  //     *max_x = std::max(*max_x, mark_x);
-  //     *max_y = std::max(*max_y, mark_y);
-  //   } 
-  // }
+    for(unsigned int i=0; i<pedestrian_.size(); ++i) {
+      double mark_x = pedestrian_[i].pose.x  + update_steps_ * pedestrian_[i].velocity * std::cos(pedestrian_[i].pose.theta) / update_freq_ ;
+      double mark_y = pedestrian_[i].pose.y  + update_steps_ * pedestrian_[i].velocity * std::sin(pedestrian_[i].pose.theta) / update_freq_ ;
+      std::pair<double, double> mark(mark_x, mark_y);
+      if( l2distance(mark, std::pair<double, double>(robot_x, robot_y)) > 0.40 ) {
+        mark_.push_back(mark);
+        *min_x = std::min(*min_x, mark_x);
+        *min_y = std::min(*min_y, mark_y);
+        *max_x = std::max(*max_x, mark_x);
+        *max_y = std::max(*max_y, mark_y);
+      }
+    }
+    update_costs_ = true;
+  }
 }
 
 void PedestrianLayer::updateCosts(costmap_2d::Costmap2D& master_grid, 
@@ -145,40 +149,51 @@ void PedestrianLayer::updateCosts(costmap_2d::Costmap2D& master_grid,
 {
   if( !enabled_ )
       return;
-  
-  unsigned int mx;
-  unsigned int my;
-  if( master_grid.worldToMap(mark_x_, mark_y_, mx, my) )
-    master_grid.setCost(mx, my, LETHAL_OBSTACLE);
-  // if ( !enabled_ )
-  //   return;
-  
-  // for (int j = min_j; j < max_j; j++) {
-  //   for (int i = min_i; i < max_i; i++) {
-  //     int index = getIndex(i, j);
-  //     // if ( costmap_[index] == costmap_2d::NO_INFORMATION )
-  //     //   continue;
-  //     master_grid.setCost(i, j, costmap_[index]); 
-  //   }
-  // }
+
+  if( update_costs_ ) {
+    unsigned int mx, cx;
+    unsigned int my, cy;
+    for(unsigned int i=0; i<clearing_.size(); ++i) {
+      if( master_grid.worldToMap(clearing_[i].first, clearing_[i].second, cx, cy) ) { 
+        for(int i=(-1)*window_radius_; i<window_radius_+1; ++i) 
+          for(int j=(-1)*window_radius_; j<window_radius_+1; ++j) 
+            master_grid.setCost(cx-i, cy-j, FREE_SPACE);
+      }
+    }
+    for(unsigned int i=0; i<mark_.size(); ++i) {
+      if( master_grid.worldToMap(mark_[i].first, mark_[i].second, mx, my) ) {
+        for(int i=(-1)*window_radius_; i<window_radius_+1; ++i) 
+          for(int j=(-1)*window_radius_; j<window_radius_+1; ++j) 
+            master_grid.setCost(mx-i, my-j, this->pedestrian_cost(mx,my,i,j));
+        master_grid.setCost(mx, my, LETHAL_OBSTACLE);
+      }
+    }
+    update_costs_ = false;
+  }
 }
 
 void PedestrianLayer::getTargets(const PTrackingBridge::TargetEstimations::ConstPtr& tgts_msg)
 {
-  // Target estimations are already in map frame
-  pedestrian.clear();
+  // Target estimations are in world frame. To convert to map frame swap x=y,y=-x
+  pedestrian_.clear();
   for(unsigned int i=0; i<tgts_msg->identities.size(); ++i) {
     target_to_pedestrian::PedestrianEstimation ped;
     ped.id = tgts_msg->identities.at(i);
-    ped.pose.x = tgts_msg->positions.at(i).x;
-    ped.pose.y = tgts_msg->positions.at(i).y;
+    ped.pose.x = tgts_msg->positions.at(i).y; 
+    ped.pose.y = -tgts_msg->positions.at(i).x; 
     ped.velocity = std::sqrt(std::pow(tgts_msg->velocities.at(i).x, 2) +
                              std::pow(tgts_msg->velocities.at(i).y, 2));
-    ped.pose.theta = std::asin(tgts_msg->velocities.at(i).y/ped.velocity);
-    ped.cov_position.data[0] = std::pow(tgts_msg->standardDeviations.at(i).x, 2);
-    ped.cov_position.data[1] = std::pow(tgts_msg->standardDeviations.at(i).y, 2);
-    pedestrian.push_back(ped);
+    ped.pose.theta = (ped.velocity > 0 ? std::asin(tgts_msg->velocities.at(i).y/ped.velocity) : 0); // reverse the angle
+    ped.std_deviation_x = std::pow(tgts_msg->standardDeviations.at(i).y, 2);
+    ped.std_deviation_y = std::pow(tgts_msg->standardDeviations.at(i).x, 2);
+    pedestrian_.push_back(ped);
   }
+}
+
+int  PedestrianLayer::pedestrian_cost(unsigned int mx, unsigned int my, int i, int j)
+{
+  double d = std::sqrt(double(i*i+j*j)); 
+  return int(std::exp(-0.001*decay_constant_*d*d)*(INSCRIBED_INFLATED_OBSTACLE-1)*(d <= window_radius_)); 
 }
 
 }

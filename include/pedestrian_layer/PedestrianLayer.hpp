@@ -75,16 +75,19 @@ class PedestrianLayer : public costmap_2d::Layer
  private:
   void reconfigureCB(costmap_2d::GenericPluginConfig&, uint32_t);
   void getTargets(const PTrackingBridge::TargetEstimations::ConstPtr&);
-  double mark_x_, mark_y_;
+  int pedestrian_cost(unsigned int, unsigned int, int, int);
   dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig> *dsrv_;  
   ros::Subscriber sub_;
-  // PTrackingBridge::TargetEstimations tgts_;
-  std::vector<target_to_pedestrian::PedestrianEstimation> pedestrian;
-  std::vector< std::pair<unsigned int, unsigned int> > clearing;
-  int count;
-  // FIX THESE
-  int update_steps;
-  double update_freq;
+  std::vector<target_to_pedestrian::PedestrianEstimation> pedestrian_;
+  std::vector< std::pair<double,double> > clearing_;
+  std::vector< std::pair<double,double> > mark_;
+  int count_;
+  int update_steps_, update_ratio_;
+  double update_freq_;
+  bool update_costs_;
+  double pedestrian_inflation_radius_;
+  int window_radius_;
+  double decay_constant_;
 };
 
 }
